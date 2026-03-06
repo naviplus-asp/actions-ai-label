@@ -43,8 +43,12 @@ runs:
           if (!body.includes(sectionHeading)) {
             return;
           }
+          const base = context.payload.pull_request?.base?.repo;
+          const repo = base
+            ? { owner: base.owner.login, repo: base.name }
+            : context.repo;
           const currentLabels = (await github.rest.issues.listLabelsOnIssue({
-            ...context.repo,
+            ...repo,
             issue_number: context.issue.number
           })).data.map(l => l.name);
 
@@ -54,11 +58,11 @@ runs:
 
             if (checked && !hasLabel) {
               try {
-                await github.rest.issues.getLabel({...context.repo, name: tool});
+                await github.rest.issues.getLabel({...repo, name: tool});
               } catch (error) {
                 if (error && error.status === 404) {
                   await github.rest.issues.createLabel({
-                    ...context.repo,
+                    ...repo,
                     name: tool,
                     color: labelColor,
                     description: labelDescription
@@ -68,13 +72,13 @@ runs:
                 }
               }
               await github.rest.issues.addLabels({
-                ...context.repo,
+                ...repo,
                 issue_number: context.issue.number,
                 labels: [tool]
               });
             } else if (!checked && hasLabel) {
               await github.rest.issues.removeLabel({
-                ...context.repo,
+                ...repo,
                 issue_number: context.issue.number,
                 name: tool
               });
