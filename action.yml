@@ -1,0 +1,82 @@
+name: 'AI Label Management'
+description: 'PR本文の「使用した生成AI」チェックに応じてラベルを付与/削除する'
+branding:
+  icon: 'tag'
+  color: 'purple'
+
+inputs:
+  ai_tools:
+    description: 'AIツール名のリスト（JSON配列文字列）'
+    required: false
+    default: '["GitHub Copilot","Cursor","Devin","Claude Code","Codex","Kiro"]'
+  section_heading:
+    description: 'PR本文でチェック欄を探す見出し（このセクションが無いPRではラベル操作をスキップする）'
+    required: false
+    default: '## 使用した生成AI'
+  label_color:
+    description: '作成するラベルの色（6桁16進、#なし）'
+    required: false
+    default: '7B68EE'
+  label_description:
+    description: '作成するラベルの説明'
+    required: false
+    default: '生成AIツール'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Manage AI labels
+      uses: actions/github-script@v8
+      env:
+        AI_TOOLS_JSON: ${{ inputs.ai_tools }}
+        SECTION_HEADING: ${{ inputs.section_heading }}
+        LABEL_COLOR: ${{ inputs.label_color }}
+        LABEL_DESCRIPTION: ${{ inputs.label_description }}
+      with:
+        script: |
+          const aiTools = JSON.parse(process.env.AI_TOOLS_JSON || '[]');
+          const sectionHeading = process.env.SECTION_HEADING || '## 使用した生成AI';
+          const labelColor = process.env.LABEL_COLOR || '7B68EE';
+          const labelDescription = process.env.LABEL_DESCRIPTION || '生成AIツール';
+
+          const body = context.payload.pull_request.body || '';
+          if (!body.includes(sectionHeading)) {
+            return;
+          }
+          const currentLabels = (await github.rest.issues.listLabelsOnIssue({
+            ...context.repo,
+            issue_number: context.issue.number
+          })).data.map(l => l.name);
+
+          for (const tool of aiTools) {
+            const checked = body.includes(`- [x] ${tool}`) || body.includes(`- [X] ${tool}`);
+            const hasLabel = currentLabels.includes(tool);
+
+            if (checked && !hasLabel) {
+              try {
+                await github.rest.issues.getLabel({...context.repo, name: tool});
+              } catch (error) {
+                if (error && error.status === 404) {
+                  await github.rest.issues.createLabel({
+                    ...context.repo,
+                    name: tool,
+                    color: labelColor,
+                    description: labelDescription
+                  });
+                } else {
+                  throw new Error(`Failed to get label "${tool}" (status: ${error && error.status ? error.status : 'unknown'})`);
+                }
+              }
+              await github.rest.issues.addLabels({
+                ...context.repo,
+                issue_number: context.issue.number,
+                labels: [tool]
+              });
+            } else if (!checked && hasLabel) {
+              await github.rest.issues.removeLabel({
+                ...context.repo,
+                issue_number: context.issue.number,
+                name: tool
+              });
+            }
+          }
