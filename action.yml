@@ -34,53 +34,5 @@ runs:
         LABEL_DESCRIPTION: ${{ inputs.label_description }}
       with:
         script: |
-          const aiTools = JSON.parse(process.env.AI_TOOLS_JSON || '[]');
-          const sectionHeading = process.env.SECTION_HEADING || '## 使用した生成AI';
-          const labelColor = process.env.LABEL_COLOR || '7B68EE';
-          const labelDescription = process.env.LABEL_DESCRIPTION || '生成AIツール';
-
-          const body = context.payload.pull_request.body || '';
-          if (!body.includes(sectionHeading)) {
-            return;
-          }
-          const base = context.payload.pull_request?.base?.repo;
-          const repo = base
-            ? { owner: base.owner.login, repo: base.name }
-            : context.repo;
-          const currentLabels = (await github.rest.issues.listLabelsOnIssue({
-            ...repo,
-            issue_number: context.issue.number
-          })).data.map(l => l.name);
-
-          for (const tool of aiTools) {
-            const checked = body.includes(`- [x] ${tool}`) || body.includes(`- [X] ${tool}`);
-            const hasLabel = currentLabels.includes(tool);
-
-            if (checked && !hasLabel) {
-              try {
-                await github.rest.issues.getLabel({...repo, name: tool});
-              } catch (error) {
-                if (error && error.status === 404) {
-                  await github.rest.issues.createLabel({
-                    ...repo,
-                    name: tool,
-                    color: labelColor,
-                    description: labelDescription
-                  });
-                } else {
-                  throw new Error(`Failed to get label "${tool}" (status: ${error && error.status ? error.status : 'unknown'})`);
-                }
-              }
-              await github.rest.issues.addLabels({
-                ...repo,
-                issue_number: context.issue.number,
-                labels: [tool]
-              });
-            } else if (!checked && hasLabel) {
-              await github.rest.issues.removeLabel({
-                ...repo,
-                issue_number: context.issue.number,
-                name: tool
-              });
-            }
-          }
+          const { default: run } = await import('${{ github.action_path }}/src/main.ts');
+          await run({ github, context, core });
