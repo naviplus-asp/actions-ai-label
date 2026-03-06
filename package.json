@@ -1,0 +1,21 @@
+{
+  "name": "actions-ai-label",
+  "version": "1.0.0",
+  "description": "PR本文の「使用した生成AI」チェックに応じてラベルを付与/削除する GitHub Action",
+  "private": true,
+  "scripts": {
+    "lint": "biome check .",
+    "lint:fix": "biome check --write .",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "1.9.4",
+    "@types/node": "22.10.1",
+    "typescript": "^5.7.2",
+    "vitest": "2.1.6"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
