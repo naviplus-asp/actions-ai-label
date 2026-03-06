@@ -30,7 +30,7 @@ jobs:
   manage-ai-labels:
     runs-on: ubuntu-latest
     steps:
-      - uses: naviplus-asp/actions-al-label@v1
+      - uses: naviplus-asp/actions-al-label@v2
 ```
 
 ### 2. オプション指定（任意）
@@ -38,7 +38,7 @@ jobs:
 AIツール名リストやセクション見出しを変えたい場合は、`with` で指定できます。
 
 ```yaml
-      - uses: naviplus-asp/actions-al-label@v1
+      - uses: naviplus-asp/actions-al-label@v2
         with:
           ai_tools: '["GitHub Copilot","Cursor","Devin","Claude Code","Codex","Kiro"]'
           section_heading: '## 使用した生成AI'
@@ -74,7 +74,7 @@ PRの説明欄でチェックされた項目に応じてラベルが付くため
 
 ## バージョン
 
-- `@v1` … 安定版（運用に合わせてタグを更新してください）
+- `@v2` … 安定版（運用に合わせてタグを更新してください）
 
 ## ライセンス
 
