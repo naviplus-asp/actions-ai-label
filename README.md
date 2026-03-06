@@ -78,4 +78,4 @@ PRの説明欄でチェックされた項目に応じてラベルが付くため
 
 ## ライセンス
 
-社内利用を想定しています。必要に応じてリポジトリのライセンスに従ってください。
+This project is licensed under the MIT License.
