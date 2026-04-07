@@ -95,10 +95,7 @@ describe("extractCoAuthorEmails", () => {
       "feat: second commit\n\nCo-Authored-By: Pair Bot <bot@example.com>",
     ];
 
-    expect(extractCoAuthorEmails(messages)).toEqual([
-      "noreply@openai.com",
-      "bot@example.com",
-    ]);
+    expect(extractCoAuthorEmails(messages)).toEqual(["noreply@openai.com", "bot@example.com"]);
   });
 });
 

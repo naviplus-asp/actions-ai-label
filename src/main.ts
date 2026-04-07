@@ -1,7 +1,7 @@
 import {
+  type AiToolEmailMap,
   computeLabelChanges,
   detectAiToolsFromCoAuthors,
-  type AiToolEmailMap,
 } from "./label-changes.ts";
 
 type Repo = { owner: string; repo: string };
@@ -21,7 +21,9 @@ type GitHubScript = {
         removeLabel(params: Repo & { issue_number: number; name: string }): Promise<unknown>;
       };
       pulls: {
-        listCommits(params: Repo & { pull_number: number; per_page?: number; page?: number }): Promise<{
+        listCommits(
+          params: Repo & { pull_number: number; per_page?: number; page?: number },
+        ): Promise<{
           data: { commit: { message: string } }[];
         }>;
       };
