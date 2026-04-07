@@ -21,6 +21,14 @@ inputs:
     description: '作成するラベルの説明'
     required: false
     default: '生成AIツール'
+  enable_coauthor_email_detection:
+    description: 'PRコミットのCo-Authored-ByメールアドレスからAIツール利用を判定するかどうか'
+    required: false
+    default: 'false'
+  ai_tool_emails:
+    description: 'Co-Authored-Byメールアドレスとラベル名の対応表（JSONオブジェクト文字列）'
+    required: false
+    default: '{"GitHub Copilot":["copilot@github.com","copilot[bot]@users.noreply.github.com","175728472@users.noreply.github.com","198982749@users.noreply.github.com"],"Cursor":["cursoragent@cursor.com"],"Devin":["devin-ai-integration[bot]@users.noreply.github.com","158243242@users.noreply.github.com","devin@devin.ai"],"Claude Code":["claude@anthropic.com","claude-code@anthropic.com","noreply@anthropic.com","claude@example.com","claude[bot]@users.noreply.github.com","209825114@users.noreply.github.com"],"Codex":["noreply@openai.com"]}'
 
 runs:
   using: 'composite'
@@ -32,6 +40,8 @@ runs:
         SECTION_HEADING: ${{ inputs.section_heading }}
         LABEL_COLOR: ${{ inputs.label_color }}
         LABEL_DESCRIPTION: ${{ inputs.label_description }}
+        ENABLE_COAUTHOR_EMAIL_DETECTION: ${{ inputs.enable_coauthor_email_detection }}
+        AI_TOOL_EMAILS_JSON: ${{ inputs.ai_tool_emails }}
       with:
         script: |
           const { default: run } = await import('${{ github.action_path }}/src/main.ts');
