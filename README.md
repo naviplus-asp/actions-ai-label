@@ -1,4 +1,4 @@
-# actions-al-label
+# actions-ai-label
 
 PR本文の「使用した生成AI」チェックと、PRコミットの `Co-Authored-By` メールアドレスに応じて、PRへラベルを自動で付与・削除する GitHub Actions 用 Composite Action です。  
 Findy Team+ などで生成AI利用の効果測定を行う際に利用できます。
@@ -30,7 +30,7 @@ jobs:
   manage-ai-labels:
     runs-on: ubuntu-latest
     steps:
-      - uses: naviplus-asp/actions-al-label@v3
+      - uses: naviplus-asp/actions-ai-label@v3
 ```
 
 ### 2. オプション指定（任意）
@@ -38,7 +38,7 @@ jobs:
 AIツール名リストやセクション見出しを変えたい場合は、`with` で指定できます。
 
 ```yaml
-      - uses: naviplus-asp/actions-al-label@v3
+      - uses: naviplus-asp/actions-ai-label@v3
         with:
           ai_tools: '["GitHub Copilot","Cursor","Devin","Claude Code","Codex","Kiro"]'
           section_heading: '## 使用した生成AI'
